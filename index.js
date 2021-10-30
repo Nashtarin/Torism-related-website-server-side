@@ -1,5 +1,6 @@
 const express=require('express');
 const { MongoClient } = require('mongodb');
+const ObjectId=require('mongodb').ObjectId;
 const cors=require('cors');
 require('dotenv').config();
 const app=express();
@@ -12,6 +13,24 @@ async function run(){
     try{
         await client.connect();
        console.log('Database Connected Successfully')
+       const database=client.db('tourism');
+       const offerCollection=database.collection('offers');
+       //Get API
+       app.get('/offers',async(req,res)=>{
+           const cursor=offerCollection.find({});
+           const offers=await cursor.toArray();
+           res.send(offers)
+       })
+    //    GET single offer
+    app.get('/offers/:offerId', async(req,res)=>{
+        const id=req.params.offerId;
+        const query={_id:ObjectId(id)};
+        const offer=await offerCollection.findOne(query);
+        res.json(offer)
+        
+
+    })
+
 
     }
     finally{
@@ -20,7 +39,7 @@ async function run(){
 }
 run().catch(console.dir)
  app.get('/',(req,res)=>{
-     res.send('Running Volunteer Network wonderfully')
+     res.send('Running Tourism wonderfully')
  });
  app.listen(port,()=>{
      console.log('Running volunteer network on port',port)
