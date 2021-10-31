@@ -15,6 +15,7 @@ async function run(){
        console.log('Database Connected Successfully')
        const database=client.db('tourism');
        const offerCollection=database.collection('offers');
+       const orderCollection=database.collection('orders')
        //Get API
        app.get('/offers',async(req,res)=>{
            const cursor=offerCollection.find({});
@@ -30,6 +31,29 @@ async function run(){
         
 
     })
+    app.get('/orders',async(req,res)=>{
+        const cursor=orderCollection.find({});
+        const orders=await cursor.toArray();
+        res.send(orders)
+    })
+    //  // Add orders API
+    //  app.post('/offers/orders', async (req, res) => {
+    //     const order = req.body;
+    //     const result = await orderCollection.insertOne(order);
+    //     res.json(result);
+    // })
+    app.post('/orders', async (req, res) => {
+          const order = req.body;
+             const result = await orderCollection.insertOne(order);
+             res.json(result);})
+// Delete API
+app.delete('/orders/:id', async (req,res)=>{
+    const id=req.params.id;
+    const query={_id:ObjectId(id)}
+    const result= await orderCollection.deleteOne(query);
+    res.json(result)
+})
+
 
 
     }
